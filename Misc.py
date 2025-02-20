@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Hello world
 def csv_reader(dataset):
     #grabs data from csv file 
     data = np.genfromtxt(dataset, dtype = float, delimiter = ',')
