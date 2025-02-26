@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 from Misc import csv_reader
 from Misc import zenith_format
 
+'''
+checklist before running:
+    - is data formatted correctly? (heatmap or time)
+    - is mode set correctly? (heatmap or time)
+'''
+
 def DHI_calc(ghi, dni, zenith_ang):
     # cycles through each 2D array and calculates surface irradiance 
     i = 0
@@ -18,6 +24,18 @@ def DHI_calc(ghi, dni, zenith_ang):
             if j == len(ghi[i]):
                 dhi.append(row)
                 break
+        i += 1
+    return dhi
+
+def DHI_calc_time(ghi, dni, zenith_ang):
+    # time as x, irradiance as y
+    i = 0
+    dhi = []
+    while i < len(ghi):
+        row = []
+        row.append(ghi[i][0])
+        row.append(float(ghi[i][1] - dni[i][1] * np.cos(zenith_ang[i][1])))
+        dhi.append(row)
         i += 1
     return dhi
 
@@ -41,8 +59,17 @@ def main():
     dni_data = np.genfromtxt(dni, dtype = float, delimiter = ',')
     print(len(dni_data))
 
-    dhi_irr = DHI_calc(ghi_data, dni_data, z_rad)
-    print(dhi_irr)
+    # mode = 0: heatmap
+    # mode = 1: irradance vs. time
+    mode = 0
+
+    if mode == 0:
+        dhi_irr = DHI_calc(ghi_data, dni_data, z_rad)
+        print(dhi_irr)
+
+    elif mode == 1:
+        dhi_irr_time = DHI_calc_time(ghi_data, dni_data, z_rad)
+        print(dhi_irr_time)
 
 if __name__ == "__main__":
     main()

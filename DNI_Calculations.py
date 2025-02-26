@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 from Misc import csv_reader
 from Misc import zenith_format
 
+'''
+checklist before running:
+    - is data formatted correctly? (heatmap or time)
+    - is mode set correctly? (heatmap or time)
+'''
+
 def DNI_calc(solar_long, optical_depth, zenith_ang):
     # initialize values
     mean_irr = 588.6
@@ -30,6 +36,26 @@ def DNI_calc(solar_long, optical_depth, zenith_ang):
 
     return surf_irr
 
+def DNI_calc_time(solar_long, optical_depth, zenith_ang):
+    # initialize values
+    mean_irr = 588.6
+    eccentricity = 0.0934
+    Ls_p = np.deg2rad(251)
+
+    #calculates Top of Atmosphere irradiance 
+    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2)
+
+    #calculates Direct Normal Irradiance irradiation
+    i = 0
+    surf_irr = []
+    while i < len(optical_depth):
+        row = []
+        row.append(optical_depth[i][0])
+        row.append(float(round(toa * np.cos(zenith_ang[i][1]) * (np.exp(-optical_depth[i][1])), 6)))
+        surf_irr.append(row)
+        i += 1
+
+    return surf_irr
 
 #### testing code for the function file ####
 
@@ -48,8 +74,17 @@ def main():
     #solar longitude input for TOA calculations
     solar_long = np.deg2rad(int(input("Solar Longitude: ")))
     
-    dni_irr = DNI_calc(solar_long, op_data, z_rad)
-    print(dni_irr)
+    # mode = 0: heatmap
+    # mode = 1: irradance vs. time
+    mode = 0
+
+    if mode == 0:
+        dni_irr = DNI_calc(solar_long, op_data, z_rad)
+        print(dni_irr)
+
+    elif mode == 1:
+        dni_irr_time = DNI_calc_time(solar_long, op_data, z_rad)
+        print(dni_irr_time)
 
 if __name__ == "__main__":
     main()
