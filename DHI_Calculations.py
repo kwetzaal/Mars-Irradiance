@@ -30,14 +30,16 @@ def DHI_calc(ghi, dni, zenith_ang):
 def DHI_calc_time(ghi, dni, zenith_ang):
     # time as x, irradiance as y
     i = 0
+    dhi_and_time = []
+    time = []
     dhi = []
     while i < len(ghi):
-        row = []
-        row.append(ghi[i][0])
-        row.append(float(ghi[i][1] - dni[i][1] * np.cos(zenith_ang[i][1])))
-        dhi.append(row)
+        time.append(ghi[0][1])
+        dhi.append(float(ghi[1][i] - dni[1][i] * np.cos(zenith_ang[1][i])))
         i += 1
-    return dhi
+    dhi_and_time.append(time)
+    dhi_and_time.append(dhi)
+    return dhi_and_time
 
 
 #### testing code for the function file ####

@@ -48,14 +48,17 @@ def DNI_calc_time(solar_long, optical_depth, zenith_ang):
     #calculates Direct Normal Irradiance irradiation
     i = 0
     surf_irr = []
-    while i < len(optical_depth):
-        row = []
-        row.append(optical_depth[i][0])
-        row.append(float(round(toa * np.cos(zenith_ang[i][1]) * (np.exp(-optical_depth[i][1])), 6)))
-        surf_irr.append(row)
-        i += 1
+    time = []
+    surf_irr_and_time = []
 
-    return surf_irr
+    while i < len(optical_depth[0]):
+        time.append(optical_depth[0][i])
+        surf_irr.append(float(round(toa * np.cos(zenith_ang[1][i]) * (np.exp(-optical_depth[1][0])), 6)))
+        i += 1
+    surf_irr_and_time.append(time)
+    surf_irr_and_time.append(surf_irr)
+
+    return surf_irr_and_time
 
 #### testing code for the function file ####
 
@@ -76,7 +79,7 @@ def main():
     
     # mode = 0: heatmap
     # mode = 1: irradance vs. time
-    mode = 0
+    mode = 1
 
     if mode == 0:
         dni_irr = DNI_calc(solar_long, op_data, z_rad)

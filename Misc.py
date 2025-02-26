@@ -30,11 +30,6 @@ def csv_reader(dataset):
             
         return(new_data)
 
-def csv_reader_2d(dataset):
-    #grabs data from csv file 
-    data = np.genfromtxt(dataset, dtype = float, delimiter = ',')
-    return(data)
-
 def zenith_format(zenith):
     #if solar zenith ang is more than 90 deg, it is not usable
     z_val = []
