@@ -60,6 +60,21 @@ def DNI_calc_time(solar_long, optical_depth, zenith_ang):
 
     return surf_irr_and_time
 
+def DNI_calc_2(toa, ghi, zenith):
+    #calculate effective global horizontal transmittence
+    Kt_row = []
+    Kt = []
+    
+    i = 0
+    while i < len(ghi):
+        j = 0
+        while j < len(ghi[i]):
+            Kt_value = ghi[i][j]/toa[i][j]
+            Kt_row.append(Kt_value)
+            j += 1
+        Kt.append(Kt_row)
+        i += 1
+
 #### testing code for the function file ####
 
 def main():
