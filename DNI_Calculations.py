@@ -17,7 +17,7 @@ def DNI_calc(solar_long, optical_depth, zenith_ang):
     Ls_p = np.deg2rad(251)
 
     #calculates Top of Atmosphere irradiance 
-    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2)
+    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2) #Altered Eq 2 (Delagodo-Baonal, et al 2016)
 
     #calculates Direct Normal Irradiance irradiation
     i = 0
@@ -27,7 +27,7 @@ def DNI_calc(solar_long, optical_depth, zenith_ang):
         j = 0
         while j < len(optical_depth[i]):
             # does DNI calculations for each value
-            row.append(float(round(toa * np.cos(zenith_ang[i][j]) * (np.exp(-optical_depth[i][j])), 6)))
+            row.append(float(round(toa * np.cos(zenith_ang[i][j]) * (np.exp(-optical_depth[i][j]/np.cos(zenith_ang[i][j]))), 6))) #Eq 4 (Delagodo-Baonal, et al 2016)
             j += 1
             if j == len(optical_depth[i]):
                 surf_irr.append(row)
@@ -43,7 +43,7 @@ def DNI_calc_time(solar_long, optical_depth, zenith_ang):
     Ls_p = np.deg2rad(251)
 
     #calculates Top of Atmosphere irradiance 
-    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2)
+    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2) #Altered Eq 2 (Delagodo-Baonal, et al 2016)
 
     #calculates Direct Normal Irradiance irradiation
     i = 0
@@ -53,27 +53,12 @@ def DNI_calc_time(solar_long, optical_depth, zenith_ang):
 
     while i < len(optical_depth[0]):
         time.append(optical_depth[0][i])
-        surf_irr.append(float(round(toa * np.cos(zenith_ang[1][i]) * (np.exp(-optical_depth[1][0])), 6)))
+        surf_irr.append(float(round(toa * np.cos(zenith_ang[1][i]) * (np.exp(-optical_depth[1][0]/np.cos(zenith_ang[1][i])), 6)))) #Eq 4 (Delagodo-Baonal, et al 2016)
         i += 1
     surf_irr_and_time.append(time)
     surf_irr_and_time.append(surf_irr)
 
     return surf_irr_and_time
-
-def DNI_calc_2(toa, ghi, zenith):
-    #calculate effective global horizontal transmittence
-    Kt_row = []
-    Kt = []
-    
-    i = 0
-    while i < len(ghi):
-        j = 0
-        while j < len(ghi[i]):
-            Kt_value = ghi[i][j]/toa[i][j]
-            Kt_row.append(Kt_value)
-            j += 1
-        Kt.append(Kt_row)
-        i += 1
 
 #### testing code for the function file ####
 

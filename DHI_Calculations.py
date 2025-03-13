@@ -19,7 +19,7 @@ def DHI_calc(ghi, dni, zenith_ang):
         j = 0
         while j < len(ghi[i]):
             # does DHI calculations for each value
-            row.append(float(ghi[i][j] - dni[i][j] * np.cos(zenith_ang[i][j])))
+            row.append(float(ghi[i][j] - dni[i][j] * np.cos(zenith_ang[i][j]))) # NREL Solar Resource Glossary (Global Horizzontal Radiation)
             j += 1
             if j == len(ghi[i]):
                 dhi.append(row)
@@ -35,7 +35,7 @@ def DHI_calc_time(ghi, dni, zenith_ang):
     dhi = []
     while i < len(ghi):
         time.append(ghi[0][1])
-        dhi.append(float(ghi[1][i] - dni[1][i] * np.cos(zenith_ang[1][i])))
+        dhi.append(float(ghi[1][i] - dni[1][i] * np.cos(zenith_ang[1][i]))) # NREL Solar Resource Glossary (Global Horizzontal Radiation)
         i += 1
     dhi_and_time.append(time)
     dhi_and_time.append(dhi)
