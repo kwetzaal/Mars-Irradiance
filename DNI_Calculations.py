@@ -17,7 +17,8 @@ def DNI_calc(solar_long, optical_depth, zenith_ang):
     Ls_p = np.deg2rad(251)
 
     #calculates Top of Atmosphere irradiance 
-    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2) #Altered Eq 2 (Delagodo-Baonal, et al 2016)
+    # Altered Eq 2 (Delagodo-Baonal, et al 2016)
+    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2) 
 
     #calculates Direct Normal Irradiance irradiation
     i = 0
@@ -26,8 +27,8 @@ def DNI_calc(solar_long, optical_depth, zenith_ang):
         row = []
         j = 0
         while j < len(optical_depth[i]):
-            # does DNI calculations for each value
-            row.append(float(round(toa * np.cos(zenith_ang[i][j]) * (np.exp(-optical_depth[i][j]/np.cos(zenith_ang[i][j]))), 6))) #Eq 4 (Delagodo-Baonal, et al 2016)
+            # Eq 4 (Delagodo-Baonal, et al 2016)
+            row.append(float(round(toa * np.cos(zenith_ang[i][j]) * (np.exp(-optical_depth[i][j]/np.cos(zenith_ang[i][j]))), 6)))
             j += 1
             if j == len(optical_depth[i]):
                 surf_irr.append(row)
@@ -42,8 +43,9 @@ def DNI_calc_time(solar_long, optical_depth, zenith_ang):
     eccentricity = 0.0934
     Ls_p = np.deg2rad(251)
 
-    #calculates Top of Atmosphere irradiance 
-    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2) #Altered Eq 2 (Delagodo-Baonal, et al 2016)
+    # calculates Top of Atmosphere irradiance 
+    # Altered Eq 2 (Delagodo-Baonal, et al 2016)
+    toa = mean_irr*((1 + (eccentricity * np.cos(solar_long-Ls_p))/(1-(eccentricity**2)))**2)
 
     #calculates Direct Normal Irradiance irradiation
     i = 0
@@ -53,7 +55,8 @@ def DNI_calc_time(solar_long, optical_depth, zenith_ang):
 
     while i < len(optical_depth[0]):
         time.append(optical_depth[0][i])
-        surf_irr.append(float(round(toa * np.cos(zenith_ang[1][i]) * (np.exp(-optical_depth[1][0]/np.cos(zenith_ang[1][i])), 6)))) #Eq 4 (Delagodo-Baonal, et al 2016)
+        # Eq 4 (Delagodo-Baonal, et al 2016)
+        surf_irr.append(float(round(toa * np.cos(zenith_ang[1][i]) * (np.exp(-optical_depth[1][0]/np.cos(zenith_ang[1][i])), 6))))
         i += 1
     surf_irr_and_time.append(time)
     surf_irr_and_time.append(surf_irr)

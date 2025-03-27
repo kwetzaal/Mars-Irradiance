@@ -51,19 +51,19 @@ def main():
         valid = False
         while not valid:
             try:
-                toa = input(str("TOA Data (.csv): "))
-                toa_data = csv_reader(toa)
+                ghi = input(str("GHI Data (.csv): "))
+                ghi_data = csv_reader(ghi)
                 valid = True
             except:
                 print("Error: File not found. Please try again.") # if toa cannot be found as a csv file, return error
         
         # error checker for data formatting
-        if not len(toa_data) == len(z_rad) == len(op_data):
+        if not len(ghi_data) == len(z_rad) == len(op_data):
             print("Error: Data is not the same size. Please check files and try again.") # if files do not have the same number of rows, return error
         else:
             row = 0
-            while row < len(toa_data):
-                if not len(toa_data[row]) == len(z_rad[row]) == len(op_data[row]):
+            while row < len(ghi_data):
+                if not len(ghi_data[row]) == len(z_rad[row]) == len(op_data[row]):
                     print("Error: Data is not the same size. Please check files and try again.") # if rows in each file do not have the same length, return error
                     break 
                 else:
@@ -74,7 +74,18 @@ def main():
     dni_irr = DNI_calc(solar_long, op_data, z_rad)
 
     # calculate diffuse horizontal irradiance map
-    dhi_irr = DHI_calc(ghi_irr, dni_irr, z_rad)
+    dhi_irr = DHI_calc(ghi_data, dni_irr, z_rad)
+
+    i = 0
+    ratio = []
+    while i < len(dni_irr):
+        row = []
+        j = 0
+        while j < len(dni_irr[i]):
+            row.append(dni_irr[i][j]/dhi_irr[i][j])
+            j += 1
+        ratio.append(row)
+        i += 1
 
     # sets axes ticks marks
     lat = [90, 86, 83, 79, 75, 71, 68, 64, 60, 56, 53, 49, 45, 41, 38, 34, 30, 26, 23, 19, 15, 11
@@ -112,8 +123,13 @@ def main():
     dhi_map.set_ylabel('Latitude')
     dhi_map.set_xlabel('Longitude')
 
-    # removes the fourth empty plot
-    axes[1,1].set_axis_off()
+    # produces and formats map to display the ratio between diffuse and direct irradiane
+    df_ratio = pd.DataFrame(ratio, index = lat, columns = long)
+    dhi_map = sns.heatmap(df_ratio, ax=axes[1,0], xticklabels=5, yticklabels=4, cbar_kws={'label': 'DNI/DHI'})
+    dhi_map.tick_params(axis='both', labelsize=8)
+    dhi_map.set_title('Ratio of DNI and DHI Values')
+    dhi_map.set_ylabel('Latitude')
+    dhi_map.set_xlabel('Longitude')
 
     # displays the plots
     plt.tight_layout()
@@ -205,7 +221,7 @@ def main():
                 break
 
     # find the closest ghi dni and dhi data points
-    ghi_sel = round(ghi_irr[l][j], 4)
+    ghi_sel = round(ghi_data[l][j], 4)
     dni_sel = round(dni_irr[l][j], 4)
     dhi_sel = round(dhi_irr[l][j], 4)
 
