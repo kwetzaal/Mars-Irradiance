@@ -1,35 +1,74 @@
-function dhi_and_time = DHI_calc_time(ghi_data, dni_data, zenith_ang)
-    % Extract time, optical depth, and zenith angle
-    time = ghi_data(:, 1).';  % Time values
-    ghi = ghi_data(:, 2).';   % Global Horizontal Irradiance values
-    dni = dni_data(2, :);   % Direct Normal Irradiance values
-    zenith = zenith_ang(:,2).'; % Zenith angles values
-    disp(dni)
+function dhi = DHI_Calculations(ghi_data, dni_data, zenith_ang)
+    %% Calculate DHI %%
 
-    % Calculate surface irradiance
-    dhi = double((ghi-dni).*cosd(zenith));
+    % calculate cos(zenith_ang)
+    sz_1 = size(zenith_ang.SolarZenithAngle);
+    zenithAngDouble = zeros(sz_1(1), sz_1(2), sz_1(3));
+    for i = 1:sz_1(1)
+        for j = 1:sz_1(2)
+            for k = 1:sz_1(3)
+                if zenith_ang.SolarZenithAngle{i,j,k} < 0         
+                    zenith_ang.SolarZenithAngle{i,j,k} = 0;
+                end
+                zen = str2double(zenith_ang.SolarZenithAngle{i,j,k});
+                cosZenith = cosd(zen);
+                zenithAngDouble(i,j,k) = cosZenith;
+            end
+        end
+    end
+    
+    dniDouble = str2double(dni_data);
+    ghiDouble = str2double(ghi_data);
+    
+    dhi = double((ghiDouble-dniDouble).*zenithAngDouble);
+end
+%% INITIALIZE DATA %%
 
-    % Store results in a cell array
-    dhi_and_time = {double(time), dhi};
-    disp(dhi_and_time)
+% Global Horizontal Irradiance 
+folder = 'C:\Users\kiraz\OneDrive\Documents\School\Purdue Freshman\VIP ABC-PV\Mars Irradiance(Matlab)\InciddentSolarFluxOnHorizontalSurface\'; % opens selected folder (Optical Depth)
+files = dir(fullfile(folder, '*.mat'));  % List all .mat files
+
+ghiData = [];
+
+% loops through all .mat files in the folder
+for k = 1:length(files)
+    filepath = fullfile(folder, files(k).name);
+    if ~exist(filepath, 'file')
+        message = printf('%s does not exist', filepath);
+    else
+        fileData = load(filepath)'; % load .mat file
+        ghiData = cat(4, ghiData, fileData); % concatonates to 4th Dimension of struct (time, lat, long, solar long)
+    end 
 end
 
-ghi_name = input("Global Horizontal Irradiance Data (.csv): ");
-ghi_data = readmatrix(ghi_name);
+% Zenith Angle
+folder = 'C:\Users\kiraz\OneDrive\Documents\School\Purdue Freshman\VIP ABC-PV\Mars Irradiance(Matlab)\SolarZenithAngle\'; % opens selected folder (Zenith Angle)
+files = dir(fullfile(folder, '*.mat'));  % List all .mat files
 
-dni_name = input("Direct Normal Irradiance Data (.csv): ");
-dni_data = readmatrix(dni_name);
+solarZenithData = [];
 
-za_name = input("Zenith Angle Data (.csv): ");
-za_data = readmatrix(za_name);
-za_data(za_data > 90) = 90;
+% loops through all .mat files in the folder
+for k = 1:length(files)
+    filepath = fullfile(folder, files(k).name);
+    if ~exist(filepath, 'file')
+        message = printf('%s does not exist', filepath);
+    else
+        fileData = load(filepath)'; % load .mat file
+        solarZenithData = cat(4, solarZenithData, fileData); % concatonates to 4th Dimension of struct (time, lat, long, solar long)
+    end 
+end
 
-dhi_data = DHI_calc_time(ghi_data, dni_data, za_data);
+% Direct Normal Irradiance
+dniData = load('DNI_Data.mat')';
 
-dhi = dhi_data{:, 2};
-time = dhi_data{:, 1};
 
-plot(time, dhi)
-xlabel('Time')
-ylabel('Diffuse Horizontal Irradiance (W/m^2)')
-title('DHI vs. Time')
+%% CALCULATIONS %%
+dhiData = [];
+i = 1;
+while i <= length(solarLongitudeData)
+    dhiDataCalc = DHI_Calculations(ghiData( :, :, :, i), dniData( : , : , : , i), solarZenithData( : , : , :, i));
+    dhiData = cat(4, dhiData, dhiDataCalc);
+    i = i + 1;
+end
+disp(dhiData)
+%save('DHI_Data','dhiData')
